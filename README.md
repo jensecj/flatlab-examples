@@ -2,7 +2,7 @@
 
 contains demonstrations of how to use the [flatlab library](https://www.github.com/jensecj/flatlab-java).
 
-The project uses and `ant` for building.
+The project uses `ant` for building.
 
 To start, clone the repo and run:
 
