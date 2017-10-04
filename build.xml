@@ -1,0 +1,50 @@
+<project name="flatlab-demo" default="build">
+
+  <property name="mainclass" value="App"/>
+
+  <property name="src" location="src"/>
+  <property name="res" location="res"/>
+  <property name="lib" location="lib"/>
+  <property name="bin" location="bin"/>
+  <property name="jar" location="jar"/>
+
+  <target name="resolve">
+    <mkdir dir="${lib}"/>
+    <get src="https://github.com/jensecj/flatlab-java/releases/download/0.2.1/flatlab.jar" dest="${lib}/flatlab.jar"/>
+  </target>
+
+  <target name="build">
+    <mkdir dir="${bin}"/>
+    <copy todir="${bin}">
+      <fileset dir="${res}"/>
+    </copy>
+    <javac includeantruntime="false" srcdir="${src}" destdir="${bin}">
+      <classpath>
+        <fileset dir="${lib}">
+          <include name="**/*.jar" />
+        </fileset>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jar" depends="build">
+    <mkdir dir="${jar}"/>
+    <jar destfile="${jar}/${ant.project.name}.jar" basedir="${bin}">
+      <fileset dir="${res}"/>
+      <zipgroupfileset includes="**/*.jar" dir="${lib}"/>
+      <manifest>
+        <attribute name="Main-Class" value="${mainclass}"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="run" depends="build, jar">
+    <java jar="${jar}/${ant.project.name}.jar" fork="true" />
+  </target>
+
+  <target name="clean">
+    <delete dir="${bin}"/>
+    <delete dir="${jar}"/>
+  </target>
+
+</project>
