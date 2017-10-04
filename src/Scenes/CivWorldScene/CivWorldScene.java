@@ -11,14 +11,14 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class CivWorldScene extends Scene {
 
-    public static final int SCREEN_WIDTH = 800;
-    public static final int SCREEN_HEIGHT = 600;
+    public static final int SCREEN_WIDTH = 1000;
+    public static final int SCREEN_HEIGHT = 800;
 
     private int _tile_size = 64;
     private int _tile_textureid;
 
-    private final int WORLD_SIZE_X = 800;
-    private final int WORLD_SIZE_Y = 600;
+    private final int WORLD_SIZE_X = 500;
+    private final int WORLD_SIZE_Y = 500;
 
     private float _cam_x = 0;
     private float _cam_y = 0;
@@ -26,7 +26,7 @@ public class CivWorldScene extends Scene {
     private float _cam_y_wanted = (WORLD_SIZE_Y / 2) * _tile_size;
 
     private float _cam_zoom = 1;
-    private float _cam_zoom_wanted = 0.1f;
+    private float _cam_zoom_wanted = 0.05f;
     private float _cam_zoom_increment = 0.05f; // 5%
 
     public TileType[][] _worldmap;
@@ -53,9 +53,7 @@ public class CivWorldScene extends Scene {
     public void init() {
         _tile_textureid = TextureLoader.load("res/hexagon512.png");
 
-        HexagonalWorldGenerator gen = new HexagonalWorldGenerator(0);
-
-        _worldmap = gen.Create(WORLD_SIZE_X, WORLD_SIZE_Y);
+        _worldmap = HexagonalWorldGenerator.Create(0, WORLD_SIZE_X, WORLD_SIZE_Y);
     }
 
     public void update(float dt) {
