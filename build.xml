@@ -10,7 +10,7 @@
 
   <target name="resolve">
     <mkdir dir="${lib}"/>
-    <get src="https://github.com/jensecj/flatlab-java/releases/download/0.2.1/flatlab.jar" dest="${lib}/flatlab.jar"/>
+    <get src="https://github.com/jensecj/flatlab-java/releases/download/0.3.0/flatlab.jar" dest="${lib}/flatlab.jar"/>
   </target>
 
   <target name="build">
