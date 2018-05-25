@@ -17,11 +17,10 @@ public class HexagonalWorldGenerator {
         PerlinNoise heat_map = new PerlinNoise(seed, 0.19f, 0.089f, 2.92f, 4, 4.1f, 0.099f, 0);
 
         for (int x = 0; x < map.length; x++)
-            for (int y = 0; y < map[x].length; y++) {
+            for (int y = 0; y < map[x].length; y++)
                 map[x][y] = get_biome(1 - elevation_map.get(x, y),
                                       1 - moisture_map.get(x, y),
                                       1 - heat_map.get(x, y));
-            }
 
         long timer_end = System.currentTimeMillis();
         long elapsed = timer_end - timer_start;
@@ -31,8 +30,7 @@ public class HexagonalWorldGenerator {
     }
 
     private static TileType get_biome(float elevation, float moisture, float heat) {
-        if(elevation < 0.10f)
-            return TileType.Ocean;
+        if(elevation < 0.10f) return TileType.Ocean;
         if(elevation < 0.15 && elevation > 0.10f)
             return TileType.LowWater;
         if(elevation > 0.15f && elevation < 0.19f && heat > 0.01f)

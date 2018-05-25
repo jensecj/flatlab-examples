@@ -1,8 +1,8 @@
 import flatlab.*;
 import flatlab.util.*;
 
-import java.lang.Math;
 import java.util.*;
+import java.lang.Math;
 
 import java.awt.image.BufferedImage;
 
@@ -17,17 +17,10 @@ public class CivWorldScene extends Scene {
     private int _tile_size = 64;
     private int _tile_textureid;
 
-    private final int WORLD_SIZE_X = 500;
-    private final int WORLD_SIZE_Y = 500;
+    private final int WORLD_WIDTH = 400;
+    private final int WORLD_HEIGHT = 200;
 
-    private float _cam_x = 0;
-    private float _cam_y = 0;
-    private float _cam_x_wanted = (WORLD_SIZE_X / 2) * (_tile_size - (_tile_size / 4));
-    private float _cam_y_wanted = (WORLD_SIZE_Y / 2) * _tile_size;
-
-    private float _cam_zoom = 1;
-    private float _cam_zoom_wanted = 0.05f;
-    private float _cam_zoom_increment = 0.05f; // 5%
+    private Camera cam = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     public TileType[][] _worldmap;
 
@@ -36,46 +29,30 @@ public class CivWorldScene extends Scene {
     }
 
     public void key(int key, int action, int mods) {
-        if (key == 'A') _cam_x_wanted -= 10 * (1 / _cam_zoom);
-        if (key == 'D') _cam_x_wanted += 10 * (1 / _cam_zoom);
-        if (key == 'W') _cam_y_wanted -= 10 * (1 / _cam_zoom);
-        if (key == 'S') _cam_y_wanted += 10 * (1 / _cam_zoom);
+        cam.on_key(key, action, mods);
     }
 
     public void mouse_scroll(float x, float y) {
-        if(y > 0)
-            _cam_zoom_wanted *= 1 + _cam_zoom_increment;
-        else
-            if (_cam_zoom_wanted > 0f)
-                _cam_zoom_wanted *= 1 - _cam_zoom_increment;
+        cam.on_mouse_scroll(x, y);
     }
 
     public void init() {
         _tile_textureid = TextureLoader.load("res/hexagon512.png");
 
-        _worldmap = HexagonalWorldGenerator.Create(0, WORLD_SIZE_X, WORLD_SIZE_Y);
+        _worldmap = HexagonalWorldGenerator.Create(0, WORLD_WIDTH, WORLD_HEIGHT);
+
+        cam.set_position((SCREEN_WIDTH / 4) * _tile_size / 2,
+                         (SCREEN_HEIGHT / 4) * _tile_size / 2);
     }
 
     public void update(float dt) {
-        if (_cam_zoom != _cam_zoom_wanted)
-            _cam_zoom = Flatmath.lerp(_cam_zoom, _cam_zoom_wanted, 0.001f);
-
-        if (_cam_x_wanted != _cam_x)
-            _cam_x = Flatmath.lerp(_cam_x, _cam_x_wanted, 0.01f);
-
-        if (_cam_y_wanted != _cam_y)
-            _cam_y = Flatmath.lerp(_cam_y, _cam_y_wanted, 0.01f);
+        cam.update(dt);
     }
 
     public void draw() {
         glPushMatrix();
 
-        // transform to the camera
-        glTranslatef(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0);
-        glScalef(_cam_zoom, _cam_zoom, 1);
-        glTranslatef(-(SCREEN_WIDTH / 2), -(SCREEN_HEIGHT / 2), 0);
-
-        glTranslatef(-_cam_x, -_cam_y, 0);
+        cam.draw();
 
         draw_tiles();
 
@@ -83,18 +60,14 @@ public class CivWorldScene extends Scene {
     }
 
     private void draw_tiles() {
-        glColor3f(0.941f, 0.875f, 0.686f); // zenburn yellow
-        glBindTexture(GL_TEXTURE_2D, _tile_textureid);
-        glBegin(GL_QUADS);
+        float world_width = (SCREEN_WIDTH * (1 / cam.zoom()));
+        float world_height = (SCREEN_HEIGHT * (1 / cam.zoom()));
 
-        float world_width = (SCREEN_WIDTH * (1 / _cam_zoom));
-        float world_height = (SCREEN_HEIGHT * (1 / _cam_zoom));
+        float min_x = cam.x() + (SCREEN_WIDTH / 2) - (world_width / 2);
+        float max_x = cam.x() + (SCREEN_WIDTH / 2) + (world_width / 2);
 
-        float min_x = _cam_x + (SCREEN_WIDTH / 2) - (world_width / 2);
-        float max_x = _cam_x + (SCREEN_WIDTH / 2) + (world_width / 2);
-
-        float min_y = _cam_y + (SCREEN_HEIGHT / 2) - (world_height / 2);
-        float max_y = _cam_y + (SCREEN_HEIGHT / 2) + (world_height / 2);
+        float min_y = cam.y() + (SCREEN_HEIGHT / 2) - (world_height / 2);
+        float max_y = cam.y() + (SCREEN_HEIGHT / 2) + (world_height / 2);
 
         // the tiles overlap in size by (tile_size / 4) because of the way they are aligned
         int overlap = _tile_size / 4;
@@ -105,6 +78,10 @@ public class CivWorldScene extends Scene {
 
         int start_y = (int)(min_y / _tile_size) - tile_padding;
         int end_y = (int)(max_y / _tile_size) + tile_padding;
+
+        glColor3f(0.941f, 0.875f, 0.686f); // zenburn yellow
+        glBindTexture(GL_TEXTURE_2D, _tile_textureid);
+        glBegin(GL_QUADS);
 
         for(int i = start_x; i < end_x; i++) {
             for(int j = start_y; j < end_y; j++) {
@@ -120,7 +97,7 @@ public class CivWorldScene extends Scene {
                     padding_y = _tile_size / 2;
 
                 // dont draw tiles outside the bounds of our map
-                if(i < 0 || j < 0 || i >= WORLD_SIZE_X || j >= WORLD_SIZE_Y)
+                if(i < 0 || j < 0 || i >= WORLD_WIDTH || j >= WORLD_HEIGHT)
                     continue;
 
                 switch (_worldmap[i][j]) {
