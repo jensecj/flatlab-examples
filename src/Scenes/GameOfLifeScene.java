@@ -17,16 +17,7 @@ public class GameOfLifeScene extends Scene {
     private int _tile_size = 64;
     private int _tile_textureid;
 
-    private float _cam_x = 0;
-    private float _cam_y = 0;
-    private float _cam_speed = 0.5f;
-    private float _cam_x_wanted = (WORLD_SIZE_X / 2 - 5) * (_tile_size);
-    private float _cam_y_wanted = (WORLD_SIZE_Y / 2 - 5) * (_tile_size);
-
-    private float _cam_zoom = 0.1f;
-    private float _cam_zoom_wanted = 0.05f;
-    private float _cam_zoom_increment = 0.15f; // 5%
-    private float _cam_zoom_speed = 0.05f;
+    private Camera cam = new Camera(SCREEN_WIDTH, SCREEN_HEIGHT);
 
     Random rng = new Random(42);
 
@@ -91,18 +82,12 @@ public class GameOfLifeScene extends Scene {
     }
 
     public void mouse_scroll(float x, float y) {
-        if(y > 0)
-            _cam_zoom_wanted *= 1 + _cam_zoom_increment;
-        else
-            if (_cam_zoom_wanted > 0f)
-                _cam_zoom_wanted *= 1 - _cam_zoom_increment;
+        cam.on_mouse_scroll(x,y);
     }
 
     public void key(int key, int action, int mods) {
-        if (key == 'A') _cam_x_wanted -= 10 * (1 / _cam_zoom);
-        if (key == 'D') _cam_x_wanted += 10 * (1 / _cam_zoom);
-        if (key == 'W') _cam_y_wanted -= 10 * (1 / _cam_zoom);
-        if (key == 'S') _cam_y_wanted += 10 * (1 / _cam_zoom);
+        cam.on_key(key, action, mods);
+
         if (key == ',') {
             speed *= 0.9f;
             System.out.println("speed: " + speed);
@@ -127,19 +112,16 @@ public class GameOfLifeScene extends Scene {
                     world[x][y] = true;
             }
         }
+
+        cam.set_position((SCREEN_WIDTH / 4) * _tile_size,
+                         (SCREEN_HEIGHT / 4) * _tile_size);
+
     }
 
     float acc = 0;
     float speed = 10f;
     public void update(float dt) {
-        if (_cam_zoom != _cam_zoom_wanted)
-            _cam_zoom = Flatmath.lerp(_cam_zoom, _cam_zoom_wanted, _cam_zoom_speed);
-
-        if (_cam_x_wanted != _cam_x)
-            _cam_x = Flatmath.lerp(_cam_x, _cam_x_wanted, _cam_speed);
-
-        if (_cam_y_wanted != _cam_y)
-            _cam_y = Flatmath.lerp(_cam_y, _cam_y_wanted, _cam_speed);
+        cam.update(dt);
 
         acc += dt;
         if(acc > speed) {
@@ -151,14 +133,14 @@ public class GameOfLifeScene extends Scene {
     }
 
     private void draw_tiles() {
-        float world_width = (SCREEN_WIDTH * (1 / _cam_zoom));
-        float world_height = (SCREEN_HEIGHT * (1 / _cam_zoom));
+        float world_width = (SCREEN_WIDTH * (1 / cam.zoom()));
+        float world_height = (SCREEN_HEIGHT * (1 / cam.zoom()));
 
-        float min_x = _cam_x + (SCREEN_WIDTH / 2) - (world_width / 2);
-        float max_x = _cam_x + (SCREEN_WIDTH / 2) + (world_width / 2);
+        float min_x = cam.x() + (SCREEN_WIDTH / 2) - (world_width / 2);
+        float max_x = cam.x() + (SCREEN_WIDTH / 2) + (world_width / 2);
 
-        float min_y = _cam_y + (SCREEN_HEIGHT / 2) - (world_height / 2);
-        float max_y = _cam_y + (SCREEN_HEIGHT / 2) + (world_height / 2);
+        float min_y = cam.y() + (SCREEN_HEIGHT / 2) - (world_height / 2);
+        float max_y = cam.y() + (SCREEN_HEIGHT / 2) + (world_height / 2);
 
         int tile_padding = 2;
 
@@ -204,12 +186,7 @@ public class GameOfLifeScene extends Scene {
     public void draw() {
         glPushMatrix();
 
-        // transform to the camera
-        glTranslatef(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0);
-        glScalef(_cam_zoom, _cam_zoom, 1);
-        glTranslatef(-(SCREEN_WIDTH / 2), -(SCREEN_HEIGHT / 2), 0);
-
-        glTranslatef(-_cam_x, -_cam_y, 0);
+        cam.draw();
 
         draw_tiles();
 
