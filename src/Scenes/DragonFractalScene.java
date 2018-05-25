@@ -1,4 +1,8 @@
+import java.util.*;
+
 import flatlab.*;
+import flatlab.util.*;
+import flatlab.util.Flatdraw.*;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -80,20 +84,15 @@ public class DragonFractalScene extends Scene {
     }
 
     public void draw() {
-
         glColor3f(0.941f, 0.875f, 0.686f); // zenburn yellow
 
         glTranslatef(400, 300, 0);
         glScalef(zoom, zoom, 1);
         glTranslatef(-400, -300, 0);
 
-        glBegin(GL_POINTS);
-
-        for(int i = 0; i < _points.length; i++) {
-            glVertex2f(_points[i], _points[++i]);
-        }
-
-        glEnd();
+        Flatdraw.batch(GL_POINTS, () -> {
+                for(int i = 0; i < _points.length; i++)
+                    Flatdraw._draw_point(new Vector2f(_points[i], _points[++i]));
+            });
     }
-
 }
