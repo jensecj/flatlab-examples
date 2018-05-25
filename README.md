@@ -16,6 +16,8 @@ mouse wheel).
 Demo | Description
 --- | ---
 CivWorldScene | A Civilization like 2D hexagonal world map generated using perlin noise
-DragonFractalScene | Creates a dragon fractal by drawing points
+DragonFractalScene | Creates a [dragon fractal](https://en.wikipedia.org/wiki/Dragon_curve) by drawing points
+LangtonsAntScene | A bunch of [Langton's ants](https://en.wikipedia.org/wiki/Langton%27s_ant)
+GameOfLifeScene | Demo of [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
 
 ![Screenshot of CivWorldScene](src/Scenes/CivWorldScene/scene.png?raw=true "Screenshot of CivWorldScene")
