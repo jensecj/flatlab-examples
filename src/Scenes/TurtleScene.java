@@ -64,6 +64,12 @@ public class TurtleScene extends Scene {
 
     public void key(int key, int action, int mods) {
         camera.on_key(key, action, mods);
+
+        if (key == ' ' && action == 0) {
+            lines.clear();
+            counter = 0;
+            System.out.println("reset");
+        }
     }
 
     public void init() {
@@ -72,12 +78,20 @@ public class TurtleScene extends Scene {
 
     int counter = 0;
     float time = 0;
+    int roof = 360*3;
     public void update(float dt) {
         time += dt;
 
         camera.update(dt);
 
-        if (counter < 360*2) {
+        if (counter < 360*3) {
+            // remove elements we're overwriting
+            if (counter > 360) {
+                lines.remove(0);
+                lines.remove(1);
+                lines.remove(2);
+            }
+
             time = 0;
             counter += 1;
 
