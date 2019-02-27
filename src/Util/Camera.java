@@ -35,6 +35,10 @@ public class Camera {
         _cam_y_wanted = y;
     }
 
+    public void set_zoom(float f) {
+        _cam_zoom_wanted = f;
+    }
+
     public void on_mouse_scroll(float x, float y) {
         if(y > 0)
             _cam_zoom_wanted *= 1 + _cam_zoom_increment;
