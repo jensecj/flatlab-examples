@@ -1,6 +1,6 @@
-# Flatlab Demoes
+# Flatlab Examples
 
-contains demonstrations of how to use the [flatlab library](https://www.github.com/jensecj/flatlab-java).
+contains demonstrations of how to use the [flatlab library](https://www.github.com/jensecj/flatlab).
 
 The project uses `ant` for building.
 
